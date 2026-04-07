@@ -1,0 +1,665 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>BEBBY - Graphic & Design</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Prompt:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Prompt', 'sans-serif'],
+                        outfit: ['Outfit', 'sans-serif'],
+                    },
+                    colors: {
+                        brand: {
+                            dark: '#E5989B',     
+                            main: '#FFB4A2',     /* ชมพูพีช */
+                            light: '#FFEFD5',    /* ครีม PapayaWhip */
+                            cream: '#FFF8F0',    /* ครีมอ่อน */
+                            text: '#6D6875',     /* น้ำตาลตุ่นๆ ให้อ่านง่าย */
+                            subtext: '#B5838D',
+                            accent: '#FFCDB2'
+                        }
+                    },
+                    boxShadow: {
+                        'app': '0 -10px 40px -15px rgba(255, 180, 162, 0.2), 0 10px 40px -15px rgba(255, 180, 162, 0.2)',
+                        'nav': '0 -5px 20px -5px rgba(255, 180, 162, 0.3)'
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            background-color: #FAFAFA;
+            -webkit-tap-highlight-color: transparent;
+            overflow-x: hidden;
+        }
+        .app-container {
+            max-width: 430px;
+            margin: 0 auto;
+            min-height: 100vh;
+            background-color: #FFF8F0; /* ครีมอ่อน */
+            position: relative;
+            box-shadow: 0 0 20px rgba(0,0,0,0.05);
+            overflow-x: hidden;
+        }
+        .gradient-bg {
+            background: linear-gradient(135deg, #FFEFD5 0%, #FFB4A2 100%);
+        }
+        
+        /* ======== EFFECTS ======== */
+        /* เอฟเฟกต์ยุบตัวตอนกด (Bouncing/Jelly) */
+        .bouncy {
+            transition: transform 0.15s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .bouncy:active {
+            transform: scale(0.92);
+        }
+
+        /* เอฟเฟกต์ลอย (Floating Emojis) */
+        .floating-emoji {
+            position: fixed;
+            pointer-events: none;
+            z-index: 9999;
+            animation: floatUpAndFade 1s cubic-bezier(0.25, 1, 0.5, 1) forwards;
+            font-size: 28px;
+            transform: translate(-50%, -50%);
+        }
+        @keyframes floatUpAndFade {
+            0% { opacity: 1; transform: translate(-50%, -50%) scale(0.5) translateY(0); }
+            50% { transform: translate(-50%, -50%) scale(1.2) translateY(-30px); }
+            100% { opacity: 0; transform: translate(-50%, -50%) scale(1) translateY(-60px); }
+        }
+
+        /* พลุ BEBBY (Confetti) */
+        .confetti-text {
+            position: fixed;
+            top: -50px;
+            font-family: 'Outfit', sans-serif;
+            font-weight: 800;
+            color: #FFB4A2;
+            font-size: 14px;
+            pointer-events: none;
+            z-index: 9998;
+            animation: fallDown 3s linear forwards;
+            text-shadow: 1px 1px 0px #FFF;
+        }
+        @keyframes fallDown {
+            0% { transform: translateY(0) rotate(0deg); opacity: 1; }
+            100% { transform: translateY(100vh) rotate(360deg); opacity: 0; }
+        }
+
+        /* เอฟเฟกต์วิ้งวับตอนเปลี่ยนหน้า */
+        .sparkle-overlay {
+            position: fixed;
+            inset: 0;
+            background: radial-gradient(circle, rgba(255,255,255,0.8) 0%, rgba(255,255,255,0) 70%);
+            z-index: 9997;
+            pointer-events: none;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+        .sparkle-overlay.active {
+            animation: flashSparkle 0.5s ease-out;
+        }
+        @keyframes flashSparkle {
+            0% { opacity: 0; }
+            50% { opacity: 1; }
+            100% { opacity: 0; }
+        }
+
+        /* หน้าต่าง Pages */
+        .page {
+            display: none;
+            animation: fadeIn 0.4s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+            padding-bottom: 90px;
+        }
+        .page.active { display: block; }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: scale(0.98) translateY(10px); }
+            to { opacity: 1; transform: scale(1) translateY(0); }
+        }
+
+        /* Popup Rules */
+        .popup-overlay {
+            background: rgba(109, 104, 117, 0.6);
+            backdrop-filter: blur(4px);
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+        }
+        .popup-overlay.show {
+            opacity: 1;
+            visibility: visible;
+        }
+        .popup-content {
+            transform: translateY(50px) scale(0.9);
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+        .popup-overlay.show .popup-content {
+            transform: translateY(0) scale(1);
+        }
+
+    </style>
+</head>
+<body class="text-brand-text font-sans antialiased">
+
+    <div id="sparkle" class="sparkle-overlay"></div>
+
+    <div id="rulesPopup" class="fixed inset-0 popup-overlay z-[100] flex items-center justify-center p-5">
+        <div class="popup-content bg-brand-cream rounded-[30px] p-6 max-w-[380px] w-full shadow-2xl border-4 border-white relative max-h-[80vh] overflow-y-auto">
+            <div class="absolute -top-4 -right-4 w-10 h-10 bg-brand-main text-white rounded-full flex items-center justify-center font-bold text-xl cursor-pointer shadow-md bouncy" onclick="closePopup()">
+                <i class="fa-solid fa-xmark"></i>
+            </div>
+            
+            <div class="text-center mb-4">
+                <div class="inline-block bg-brand-light px-4 py-1 rounded-full text-brand-dark font-bold text-sm mb-2 border border-white shadow-sm">
+                    <i class="fa-solid fa-bell mr-1"></i> ควรอ่าน
+                </div>
+                <h2 class="text-lg font-bold text-brand-text">ขั้นตอนรายละเอียดการสั่งงาน</h2>
+            </div>
+
+            <div class="space-y-4 text-xs text-brand-text leading-relaxed">
+                <div class="bg-white p-3 rounded-xl border border-brand-light shadow-sm">
+                    <p class="font-bold text-brand-dark mb-1"><i class="fa-regular fa-clock"></i> ระยะเวลารองาน</p>
+                    <ul class="list-disc pl-4 space-y-1">
+                        <li>รองาน 2 - 4 วัน (แนะนำให้สอบถามคิวงานก่อน)</li>
+                        <li>ขอคนรองานได้ตามเวลาที่แจ้ง ไม่เร่ง ไม่ตามจิก โวยวาย</li>
+                        <li>ไม่ทำตามแนวร้านอื่น <span class="text-brand-dark font-bold">รับทำเฉพาะแนวของทางร้าน</span></li>
+                    </ul>
+                </div>
+
+                <div class="bg-white p-3 rounded-xl border border-brand-light shadow-sm">
+                    <p class="font-bold text-brand-dark mb-1"><i class="fa-solid fa-list-check"></i> การแจ้งรายละเอียด</p>
+                    <ul class="list-disc pl-4 space-y-1">
+                        <li>แจ้งรายละเอียดหลังจากโอน <span class="text-red-400 font-bold">ภายใน 2 สัปดาห์</span></li>
+                        <li>ถ้าร้านเตือนแล้วยังไม่แจ้ง ภายใน 2 สัปดาห์ <span class="text-red-400 font-bold">ตัดคิวและไม่คืนเงินทันที</span></li>
+                        <li>แจ้งรายละเอียดให้ครบถ้วนถูกต้อง แน่นอนว่าเอาแบบนี้เลย</li>
+                        <li>อยากได้โทนสีถูกใจ แนะนำส่งพาเลทสีมาให้ร้านได้ค่ะ</li>
+                    </ul>
+                </div>
+
+                <div class="bg-white p-3 rounded-xl border border-brand-light shadow-sm">
+                    <p class="font-bold text-brand-dark mb-1"><i class="fa-solid fa-pen-nib"></i> การแก้งาน & งานเร่ง</p>
+                    <ul class="list-disc pl-4 space-y-1">
+                        <li>แก้ได้ 2 ครั้ง (แจ้งให้ครบในครั้งเดียว)</li>
+                        <li><span class="text-red-400 font-bold">ไม่รับแก้:</span> สั่งอีกแบบแล้วจะแก้เป็นอีกแบบ / ให้ร้านคิดสีให้แล้วมาขอแก้สี / แก้ข้อความเยอะๆ</li>
+                        <li><span class="text-brand-main font-bold">เร่ง 24 ชม.:</span> +50฿ (ได้ 2 งาน)</li>
+                        <li><span class="text-brand-main font-bold">เร่ง 3-4 ชม.:</span> +100฿ (ได้ 1 งาน)</li>
+                    </ul>
+                </div>
+
+                <p class="text-center font-bold text-[11px] text-red-400 mt-2 bg-red-50 p-2 rounded-lg">
+                    สั่งงานแล้ว = ร้านลงคิวให้<br>ไม่ยกเลิกงาน ขอเงินคืน ทุกกรณี<br>
+                    * รบกวนอ่านให้ครบ โอน = ยอมรับข้อตกลงแล้ว
+                </p>
+            </div>
+            
+            <button class="w-full mt-5 bg-brand-main text-white font-bold py-3 rounded-xl shadow-md bouncy text-sm" onclick="closePopup()">
+                รับทราบและเข้าใจแล้ว 💖
+            </button>
+        </div>
+    </div>
+
+    <div class="app-container flex flex-col">
+        
+        <div id="page-home" class="page active">
+            <div class="gradient-bg pt-12 px-6 pb-24 relative rounded-b-[45px] shadow-sm">
+                <div class="absolute top-0 right-0 p-4 opacity-50">
+                    <i class="fa-solid fa-sparkles text-4xl text-white"></i>
+                </div>
+                
+                <div class="text-center z-10 relative">
+                    <div class="inline-block bg-white/30 backdrop-blur-sm px-4 py-1.5 rounded-full text-brand-text font-outfit font-bold text-xs tracking-widest mb-3 border border-white/50 shadow-sm">
+                        ˚꒰ welcome to bebby ꒱
+                    </div>
+                    <h1 class="text-3xl font-extrabold text-brand-text drop-shadow-sm flex justify-center items-center gap-2">
+                        BEBBY
+                        <img src="https://fonts.gstatic.com/s/e/notoemoji/latest/1f9f8/512.gif" alt="🧸" width="30" height="30">
+                    </h1>
+                    <p class="text-sm font-medium text-brand-text/80 mt-1">Admin ice / bebby</p>
+                </div>
+                
+                <div class="w-[120px] h-[120px] bg-white rounded-full border-4 border-white shadow-lg mx-auto mt-6 relative z-20 flex items-center justify-center overflow-hidden bouncy" onclick="createConfetti()">
+                    <img src="https://i.postimg.cc/mZhGxkC6/profile-placeholder.jpg" alt="Bebby Logo" class="w-full h-full object-cover" onerror="this.src='https://placehold.co/200x200/FFEFD5/FFB4A2?text=BEBBY&font=Outfit'">
+                </div>
+            </div>
+
+            <div class="bg-brand-cream rounded-t-[40px] -mt-16 relative z-10 pt-20 px-5 pb-6">
+                
+                <div class="text-center mb-6 px-4">
+                    <p class="text-sm text-brand-text font-medium leading-relaxed">
+                        รับออกแบบทุกอย่างบนโลก | แอพพรีเมี่ยม | ลายน้ำ<br>
+                        สติกเกอร์ไลน์ | งานเขียนการบ้าน | รับทำเว็บร้าน
+                    </p>
+                    <div class="mt-3 flex justify-center gap-2 flex-wrap">
+                        <span class="text-[10px] bg-brand-light text-brand-subtext px-3 py-1 rounded-full border border-white shadow-sm">🎨 บรีฟได้ตามใจ</span>
+                        <span class="text-[10px] bg-brand-light text-brand-subtext px-3 py-1 rounded-full border border-white shadow-sm">📁 ส่งงานผ่าน Drive</span>
+                        <span class="text-[10px] bg-brand-light text-brand-subtext px-3 py-1 rounded-full border border-white shadow-sm">💡 ปรึกษาได้น้า</span>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-2 gap-3 mb-6">
+                    <a href="https://lin.ee/SaFWXN3" target="_blank" class="bouncy bg-[#00B900] text-white rounded-2xl p-4 flex flex-col items-center justify-center gap-2 shadow-md border-2 border-white">
+                        <i class="fa-brands fa-line text-3xl"></i>
+                        <span class="text-xs font-bold">ติดต่อ Line</span>
+                    </a>
+                    <a href="https://drive.google.com/drive/folders/1x3qtzrZDN9xQmhgP2O4LZGkTSUWg92kG" target="_blank" class="bouncy bg-brand-main text-white rounded-2xl p-4 flex flex-col items-center justify-center gap-2 shadow-md border-2 border-white">
+                        <i class="fa-solid fa-folder-open text-3xl"></i>
+                        <span class="text-xs font-bold">ดูตัวอย่างงาน</span>
+                    </a>
+                </div>
+
+                <div class="bg-white rounded-2xl p-4 border-2 border-brand-light shadow-sm text-center mb-4">
+                    <div class="flex items-center justify-center gap-2 mb-2">
+                        <i class="fa-solid fa-star text-brand-main"></i>
+                        <h3 class="font-bold text-sm text-brand-text">งานป้าย / งานออกแบบ</h3>
+                        <i class="fa-solid fa-star text-brand-main"></i>
+                    </div>
+                    <p class="text-xs text-brand-subtext mb-2">เริ่มต้น 69 - 199฿ (มีราคาเหมา 3 ป้ายขึ้นไป)</p>
+                    <p class="text-[11px] text-brand-text bg-brand-light/50 p-2 rounded-lg inline-block">
+                        รองาน 1 - 14 วันตามคิว<br>
+                        <span class="font-bold text-brand-dark">คิดราคาตามรายละเอียดงาน ส่งบรีฟให้ประเมินได้ค่ะ</span>
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <div id="page-services" class="page">
+            <div class="gradient-bg pt-10 px-6 pb-20 relative rounded-b-[40px]">
+                <div class="text-center z-10 relative">
+                    <h1 class="text-2xl font-bold text-brand-text flex justify-center items-center gap-2">
+                        เรทราคาบริการ 🎨
+                    </h1>
+                    <p class="text-xs text-brand-text/80 mt-1">วาดมือ 100% ไม่ใช้ AI แน่นอน เอกลักษณ์เฉพาะตัว</p>
+                </div>
+            </div>
+
+            <div class="px-5 -mt-10 relative z-10 pb-8 space-y-4">
+                
+                <div class="bg-white rounded-[24px] shadow-app border-2 border-brand-light p-5 relative overflow-hidden">
+                    <div class="absolute -right-4 -top-4 text-brand-light opacity-50 text-6xl"><i class="fa-solid fa-palette"></i></div>
+                    <h3 class="text-md font-bold text-brand-text mb-1 relative z-10">✨ ปล่อยเอฟ ลายเส้น & ลงสี</h3>
+                    <p class="text-[10px] text-brand-subtext mb-3 relative z-10">ของตกแต่ง “เฉพาะร้าน” ไม่ซ้ำใคร</p>
+                    
+                    <div class="space-y-2 relative z-10">
+                        <div class="flex justify-between items-center bg-brand-cream p-3 rounded-xl border border-brand-light">
+                            <span class="text-xs font-medium"><i class="fa-solid fa-pen text-brand-main mr-2"></i>ลายเส้น</span>
+                            <span class="font-bold text-brand-dark text-sm">29 - 120 ฿</span>
+                        </div>
+                        <div class="flex justify-between items-center bg-brand-cream p-3 rounded-xl border border-brand-light">
+                            <span class="text-xs font-medium"><i class="fa-solid fa-fill-drip text-brand-main mr-2"></i>ลงสีแล้ว</span>
+                            <span class="font-bold text-brand-dark text-sm">49 - 589 ฿</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bg-white rounded-[24px] shadow-app border-2 border-brand-light p-5">
+                    <h3 class="text-md font-bold text-brand-text mb-1">🖌️ เรทราคางานวาด & งานลงสี</h3>
+                    <p class="text-[10px] text-brand-subtext mb-3">แก้งานได้สองครั้ง ทางร้านจะส่งแบบร่างให้ก่อนเสมอ</p>
+                    
+                    <div class="space-y-2 mb-3">
+                        <div class="bg-brand-cream p-3 rounded-xl border border-brand-light">
+                            <p class="font-bold text-xs text-brand-text mb-2">งานวาด</p>
+                            <div class="flex justify-between items-center text-xs mb-1">
+                                <span>- เริ่มต้นชิ้นละ</span>
+                                <span class="font-bold text-brand-main">39 ฿</span>
+                            </div>
+                            <div class="flex justify-between items-center text-xs">
+                                <span>- คาแรคเตอร์สัตว์ เริ่มต้น</span>
+                                <span class="font-bold text-brand-main">100 - 399 ฿</span>
+                            </div>
+                            <p class="text-[9px] text-brand-subtext mt-1 text-right">* มี +เพิ่มตามรายละเอียด</p>
+                        </div>
+                        
+                        <div class="bg-brand-cream p-3 rounded-xl border border-brand-light">
+                            <p class="font-bold text-xs text-brand-text mb-2">งานลงสี</p>
+                            <div class="flex justify-between items-center text-xs">
+                                <span>- เริ่มต้นชิ้นละ</span>
+                                <span class="font-bold text-brand-main">49 ฿</span>
+                            </div>
+                            <p class="text-[9px] text-brand-subtext mt-1 text-right">* มี +เพิ่มตามรายละเอียด</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bg-brand-main/10 rounded-[24px] border border-brand-main/30 p-5">
+                    <h3 class="text-sm font-bold text-brand-dark mb-3"><i class="fa-solid fa-coins mr-1"></i> ค่าบริการเพิ่มเติม</h3>
+                    <ul class="text-xs space-y-2 text-brand-text">
+                        <li class="flex justify-between border-b border-brand-main/20 pb-1">
+                            <span>งานเร่งด่วน (เริ่มต้น)</span>
+                            <span class="font-bold text-brand-dark">+70 ฿ / งาน</span>
+                        </li>
+                        <li class="flex justify-between border-b border-brand-main/20 pb-1">
+                            <span>งานแก้ (เกินโควต้า)</span>
+                            <span class="font-bold text-brand-dark">+15 ฿ / จุด</span>
+                        </li>
+                        <li class="flex justify-between border-b border-brand-main/20 pb-1">
+                            <span>แก้ในสไตล์ที่ไม่ได้แจ้ง</span>
+                            <span class="font-bold text-brand-dark">+50 ฿</span>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div id="page-queue" class="page">
+            <div class="gradient-bg pt-10 px-6 pb-20 relative rounded-b-[40px]">
+                <div class="text-center z-10 relative">
+                    <h1 class="text-2xl font-bold text-brand-text">เช็คคิวงาน 📋</h1>
+                    <p class="text-xs text-brand-text/80 mt-1">อัปเดตสถานะงานของคุณได้ที่นี่</p>
+                </div>
+            </div>
+
+            <div class="px-5 -mt-10 relative z-10 pb-8 space-y-4">
+                
+                <div class="grid grid-cols-2 gap-3">
+                    <div class="bg-white rounded-[20px] shadow-sm border border-brand-light p-4 text-center bouncy">
+                        <div class="text-brand-main text-2xl mb-1"><i class="fa-solid fa-hourglass-half"></i></div>
+                        <p class="text-[10px] text-brand-subtext font-bold">คิวที่รอทั้งหมด</p>
+                        <h2 class="text-2xl font-extrabold text-brand-dark" id="q-waiting">...</h2>
+                    </div>
+                    <div class="bg-white rounded-[20px] shadow-sm border border-brand-light p-4 text-center bouncy">
+                        <div class="text-[#00B900] text-2xl mb-1"><i class="fa-solid fa-check-circle"></i></div>
+                        <p class="text-[10px] text-brand-subtext font-bold">งานเสร็จวันนี้</p>
+                        <h2 class="text-2xl font-extrabold text-brand-text" id="q-done">...</h2>
+                    </div>
+                </div>
+
+                <div class="bg-brand-accent/20 rounded-[20px] border border-brand-accent p-4 flex items-center justify-between">
+                    <div>
+                        <p class="text-[10px] font-bold text-brand-subtext">คิวที่กำลังทำปัจจุบัน</p>
+                        <p class="text-lg font-bold text-brand-dark" id="q-current">Q-014 (น้องน้ำใส)</p>
+                    </div>
+                    <div class="w-12 h-12 bg-white rounded-full flex items-center justify-center text-brand-accent text-xl shadow-sm">
+                        <i class="fa-solid fa-paintbrush"></i>
+                    </div>
+                </div>
+
+                <div class="flex justify-center bg-white rounded-xl border border-brand-light p-1 shadow-sm w-max mx-auto my-4">
+                    <button class="px-4 py-1.5 rounded-lg text-xs font-bold transition-colors bg-brand-light text-brand-dark" id="btn-list" onclick="toggleQueueView('list')">แบบรายการ</button>
+                    <button class="px-4 py-1.5 rounded-lg text-xs font-bold transition-colors text-brand-subtext" id="btn-cal" onclick="toggleQueueView('cal')">แบบปฏิทิน</button>
+                </div>
+
+                <div class="bg-white rounded-[24px] shadow-app border border-brand-light p-5 min-h-[250px]" id="queue-container">
+                    <div class="text-center text-brand-subtext text-xs py-10 flex flex-col items-center">
+                        <i class="fa-solid fa-spinner fa-spin text-2xl text-brand-main mb-2"></i>
+                        กำลังดึงข้อมูลจาก Sheet...
+                        <p class="text-[9px] mt-2 opacity-50">(เชื่อม API ตรงนี้ด้วย fetchDataFromSheet)</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="page-order" class="page">
+            <div class="gradient-bg pt-10 px-6 pb-20 relative rounded-b-[40px]">
+                <div class="text-center z-10 relative">
+                    <h1 class="text-2xl font-bold text-brand-text flex justify-center items-center gap-2">
+                        วิธีสั่งงานร้านเบ้บ 📝
+                    </h1>
+                    <p class="text-[11px] bg-white/40 inline-block px-3 py-1 rounded-full text-brand-text font-bold mt-2 shadow-sm">
+                        โอน = ยอมรับข้อตกลงและยินดีให้ปรับ 999฿
+                    </p>
+                </div>
+            </div>
+
+            <div class="px-5 -mt-6 relative z-10 pb-8 space-y-4">
+                
+                <div class="space-y-3">
+                    <div class="bg-white rounded-2xl shadow-sm border border-brand-light p-4 relative overflow-hidden group">
+                        <div class="absolute left-0 top-0 bottom-0 w-2 bg-red-300"></div>
+                        <h4 class="font-bold text-brand-text text-sm flex items-center gap-2">
+                            <span class="bg-brand-light w-6 h-6 rounded-full flex items-center justify-center text-brand-dark font-black">1</span>
+                            ห้ามก๊อปปี้เรฟร้านอื่น!
+                        </h4>
+                        <p class="text-[11px] text-brand-subtext mt-2 pl-8 leading-relaxed">
+                            ไม่รับทำงานเรฟจากร้านอื่น ชอบผลงานร้านไหน ทำร้านนั้น และไม่อนุญาตให้นำผลงานทางร้านไปเรฟร้านอื่นทุกกรณี <br>
+                            <span class="text-red-400 font-bold bg-red-50 px-1 rounded">หากพบเจอปรับ 999฿ ❌</span> ไม่รับโทนสีที่ขัดกัน
+                        </p>
+                    </div>
+
+                    <div class="bg-white rounded-2xl shadow-sm border border-brand-light p-4 relative overflow-hidden">
+                        <div class="absolute left-0 top-0 bottom-0 w-2 bg-brand-main"></div>
+                        <h4 class="font-bold text-brand-text text-sm flex items-center gap-2">
+                            <span class="bg-brand-light w-6 h-6 rounded-full flex items-center justify-center text-brand-dark font-black">2</span>
+                            แจ้งงานที่ต้องการสั่ง
+                        </h4>
+                        <p class="text-[11px] text-brand-subtext mt-2 pl-8 leading-relaxed">
+                            เช่น ลายน้ำ, ป้ายแอพพรี <b>บรีฟเป็นข้อความเท่านั้น</b> ไม่รับบรีฟรูปภาพ/อักษรพิเศษ เช็คบรีฟให้ครบถ้วน ทางร้านจะสรุปงานให้ และยึดข้อความสรุปงานเป็นหลัก ✅
+                        </p>
+                    </div>
+
+                    <div class="bg-white rounded-2xl shadow-sm border border-brand-light p-4 relative overflow-hidden">
+                        <div class="absolute left-0 top-0 bottom-0 w-2 bg-brand-main"></div>
+                        <h4 class="font-bold text-brand-text text-sm flex items-center gap-2">
+                            <span class="bg-brand-light w-6 h-6 rounded-full flex items-center justify-center text-brand-dark font-black">3</span>
+                            ตรวจสอบบรีฟให้ดี
+                        </h4>
+                        <p class="text-[11px] text-brand-subtext mt-2 pl-8 leading-relaxed">
+                            หากมีการเพิ่มเติมหลังงานเสร็จ อาจมี +เพิ่ม จึงควรบรีฟให้ครบตั้งแต่ครั้งแรก<br>
+                            - ต้องการแก้ <span class="font-bold text-brand-dark">+10฿/จุด</span><br>
+                            - แก้ในสไตล์ที่ไม่ได้แจ้ง <span class="font-bold text-brand-dark">+50฿</span>
+                        </p>
+                    </div>
+
+                    <div class="bg-white rounded-2xl shadow-sm border border-brand-light p-4 relative overflow-hidden">
+                        <div class="absolute left-0 top-0 bottom-0 w-2 bg-brand-main"></div>
+                        <h4 class="font-bold text-brand-text text-sm flex items-center gap-2">
+                            <span class="bg-brand-light w-6 h-6 rounded-full flex items-center justify-center text-brand-dark font-black">4</span>
+                            การจองคิว & ชำระเงิน
+                        </h4>
+                        <p class="text-[11px] text-brand-subtext mt-2 pl-8 leading-relaxed">
+                            <span class="font-bold text-brand-text">โอน = จองคิว</span> ไม่รับทำก่อนโอนไม่ว่ากรณีใดๆ ทั้งสิ้น รับมัดจำ รับผ่อน (ผ่อนครบลงคิว) ✅
+                        </p>
+                    </div>
+
+                    <div class="bg-white rounded-2xl shadow-sm border border-brand-light p-4 relative overflow-hidden">
+                        <div class="absolute left-0 top-0 bottom-0 w-2 bg-brand-text"></div>
+                        <h4 class="font-bold text-brand-text text-sm flex items-center gap-2">
+                            <span class="bg-brand-light w-6 h-6 rounded-full flex items-center justify-center text-brand-dark font-black">5</span>
+                            นโยบายการยกเลิก
+                        </h4>
+                        <p class="text-[11px] text-brand-subtext mt-2 pl-8 leading-relaxed">
+                            ในกรณีที่ลูกค้าโอนมาแล้วแต่ต้องการยกเลิกงาน ทางร้าน<span class="text-red-400 font-bold">ขอสงวนสิทธิ์ไม่คืนเงินทุกกรณี</span> ทั้งกรณีเริ่มงานแล้วหรือระหว่างลงคิว โปรดตัดสินใจก่อนตกลงซื้อขาย
+                        </p>
+                    </div>
+                </div>
+
+                <div class="text-center mt-6 mb-2">
+                    <p class="text-[10px] text-brand-text/50 font-bold">งานทุกงานใช้เองคนเดียวเท่านั้น ห้ามนำไปให้คนอื่นใช้ต่อ ห้ามลงกลุ่มตัวแทน</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="fixed bottom-0 left-0 right-0 bg-white/90 backdrop-blur-md border-t border-brand-light px-6 py-3 z-50 shadow-nav max-w-[430px] mx-auto rounded-t-3xl">
+            <div class="flex justify-between items-end pb-2">
+                <div class="flex flex-col items-center gap-1 cursor-pointer w-1/4 text-brand-main bouncy" onclick="switchTab('page-home', 0)" id="nav-item-0">
+                    <i class="fa-solid fa-house text-xl mb-0.5"></i>
+                    <span class="text-[9px] font-bold">หน้าแรก</span>
+                </div>
+                <div class="flex flex-col items-center gap-1 cursor-pointer w-1/4 text-brand-subtext hover:text-brand-main transition-colors bouncy" onclick="switchTab('page-services', 1)" id="nav-item-1">
+                    <i class="fa-solid fa-palette text-xl mb-0.5"></i>
+                    <span class="text-[9px] font-medium">เรทราคา</span>
+                </div>
+                <div class="flex flex-col items-center gap-1 cursor-pointer w-1/4 text-brand-subtext hover:text-brand-main transition-colors bouncy" onclick="switchTab('page-queue', 2)" id="nav-item-2">
+                    <i class="fa-solid fa-list-check text-xl mb-0.5"></i>
+                    <span class="text-[9px] font-medium">เช็คคิว</span>
+                </div>
+                <div class="flex flex-col items-center gap-1 cursor-pointer w-1/4 text-brand-subtext hover:text-brand-main transition-colors bouncy" onclick="switchTab('page-order', 3)" id="nav-item-3">
+                    <i class="fa-solid fa-scroll text-xl mb-0.5"></i>
+                    <span class="text-[9px] font-medium">วิธีสั่งงาน</span>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        // --- 1. Floating Emoji Effect ---
+        const emojis = ['🌥️', '⭐️', '🫯', '🫧', '🪼', '🧸', '🩷'];
+        document.addEventListener('click', function(e) {
+            // ไม่แสดงถ้ากดโดนปุ่มหรือลิงก์ที่มีเอฟเฟกต์อยู่แล้ว (กันรำคาญ)
+            if(e.target.closest('button') || e.target.closest('a') || e.target.closest('.bouncy')) {
+                // ให้เด้งได้ แต่เอาตัวเล็กๆ พอ
+            }
+
+            const span = document.createElement('span');
+            span.innerText = emojis[Math.floor(Math.random() * emojis.length)];
+            span.className = 'floating-emoji';
+            span.style.left = e.clientX + 'px';
+            span.style.top = e.clientY + 'px';
+            document.body.appendChild(span);
+
+            // ลบ element ทิ้งหลังแอนิเมชันจบ
+            setTimeout(() => {
+                span.remove();
+            }, 1000);
+        });
+
+        // --- 2. Confetti Effect (BEBBY) ---
+        function createConfetti() {
+            for(let i=0; i<15; i++) {
+                setTimeout(() => {
+                    const el = document.createElement('div');
+                    el.innerText = 'BEBBY';
+                    el.className = 'confetti-text';
+                    // สุ่มตำแหน่ง X
+                    el.style.left = Math.random() * 100 + 'vw';
+                    // สุ่มขนาด
+                    el.style.fontSize = (Math.random() * 10 + 10) + 'px';
+                    // สุ่มระยะเวลาตก
+                    el.style.animationDuration = (Math.random() * 2 + 2) + 's';
+                    document.body.appendChild(el);
+
+                    setTimeout(() => el.remove(), 4000);
+                }, i * 100);
+            }
+        }
+
+        // --- 3. Tab Switching & Sparkle Effect ---
+        function switchTab(pageId, navIndex) {
+            // Sparkle Effect
+            const sparkle = document.getElementById('sparkle');
+            sparkle.classList.remove('active');
+            void sparkle.offsetWidth; // trigger reflow
+            sparkle.classList.add('active');
+
+            // Switch Page
+            document.querySelectorAll('.page').forEach(page => {
+                page.classList.remove('active');
+            });
+            document.getElementById(pageId).classList.add('active');
+            window.scrollTo(0, 0);
+
+            // Update Nav Styles
+            for (let i = 0; i <= 3; i++) {
+                const item = document.getElementById(`nav-item-${i}`);
+                if (item) {
+                    if (i === navIndex) {
+                        item.classList.remove('text-brand-subtext');
+                        item.classList.add('text-brand-main');
+                        item.querySelector('span').classList.replace('font-medium', 'font-bold');
+                    } else {
+                        item.classList.remove('text-brand-main');
+                        item.classList.add('text-brand-subtext');
+                        item.querySelector('span').classList.replace('font-bold', 'font-medium');
+                    }
+                }
+            }
+
+            // ถ้าเปิดหน้าคิว ให้โหลดข้อมูลจำลอง
+            if(pageId === 'page-queue') {
+                fetchDataFromSheet();
+            }
+        }
+
+        // --- 4. Popup Logic ---
+        window.onload = () => {
+            // แสดง Popup หลังจากโหลดหน้าเว็บเสร็จ 1 วินาที
+            setTimeout(() => {
+                document.getElementById('rulesPopup').classList.add('show');
+            }, 1000);
+        };
+
+        function closePopup() {
+            document.getElementById('rulesPopup').classList.remove('show');
+        }
+
+        // --- 5. Mockup Google Sheet Fetch ---
+        function fetchDataFromSheet() {
+            // *ตรงนี้คือฟังก์ชันเตรียมไว้เชื่อม Web App URL ของ Google Apps Script*
+            // const webAppUrl = "YOUR_GOOGLE_SCRIPT_URL";
+            // fetch(webAppUrl).then(res => res.json()).then(data => {...})
+
+            setTimeout(() => {
+                // อัปเดตตัวเลขจำลอง
+                document.getElementById('q-waiting').innerText = '12';
+                document.getElementById('q-done').innerText = '5';
+                
+                toggleQueueView('list'); // โหลดหน้า List เป็นค่าเริ่มต้น
+            }, 1000);
+        }
+
+        function toggleQueueView(view) {
+            const btnList = document.getElementById('btn-list');
+            const btnCal = document.getElementById('btn-cal');
+            const container = document.getElementById('queue-container');
+
+            if(view === 'list') {
+                btnList.className = 'px-4 py-1.5 rounded-lg text-xs font-bold transition-colors bg-brand-light text-brand-dark bouncy';
+                btnCal.className = 'px-4 py-1.5 rounded-lg text-xs font-bold transition-colors text-brand-subtext bouncy';
+                
+                // HTML จำลองแบบ List
+                container.innerHTML = `
+                    <div class="space-y-3">
+                        <div class="bg-brand-cream p-3 rounded-xl border border-brand-light flex justify-between items-center">
+                            <div>
+                                <span class="bg-brand-main text-white text-[9px] px-2 py-0.5 rounded font-bold">กำลังทำ</span>
+                                <p class="text-sm font-bold text-brand-text mt-1">Q-014 (น้องน้ำใส)</p>
+                            </div>
+                            <span class="text-xs font-bold text-brand-main">70%</span>
+                        </div>
+                        <div class="bg-white p-3 rounded-xl border border-gray-100 flex justify-between items-center opacity-70">
+                            <div>
+                                <span class="bg-gray-200 text-gray-500 text-[9px] px-2 py-0.5 rounded font-bold">รอคิว</span>
+                                <p class="text-sm font-bold text-brand-text mt-1">Q-015 (K. พลอย)</p>
+                            </div>
+                        </div>
+                        <div class="bg-white p-3 rounded-xl border border-gray-100 flex justify-between items-center opacity-70">
+                            <div>
+                                <span class="bg-gray-200 text-gray-500 text-[9px] px-2 py-0.5 rounded font-bold">รอคิว</span>
+                                <p class="text-sm font-bold text-brand-text mt-1">Q-016 (Beboy)</p>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            } else {
+                btnCal.className = 'px-4 py-1.5 rounded-lg text-xs font-bold transition-colors bg-brand-light text-brand-dark bouncy';
+                btnList.className = 'px-4 py-1.5 rounded-lg text-xs font-bold transition-colors text-brand-subtext bouncy';
+                
+                // HTML จำลองแบบ Calendar
+                container.innerHTML = `
+                    <div class="text-center py-8">
+                        <div class="text-4xl text-brand-light mb-2"><i class="fa-regular fa-calendar"></i></div>
+                        <p class="text-xs font-bold text-brand-text mb-1">มุมมองปฏิทิน</p>
+                        <p class="text-[10px] text-brand-subtext">รอเชื่อมต่อข้อมูลกับ Google Calendar / Sheet</p>
+                        <div class="grid grid-cols-7 gap-1 mt-4 text-[10px] text-center">
+                            <div class="font-bold text-brand-main">จ</div><div>อ</div><div>พ</div><div>พฤ</div><div>ศ</div><div>ส</div><div class="text-red-400">อา</div>
+                            <div class="bg-gray-50 p-2 rounded">1</div><div class="bg-gray-50 p-2 rounded">2</div><div class="bg-brand-light p-2 rounded font-bold text-brand-dark">3</div><div class="bg-brand-light p-2 rounded font-bold text-brand-dark">4</div><div class="bg-brand-light p-2 rounded font-bold text-brand-dark">5</div><div class="bg-gray-50 p-2 rounded">6</div><div class="bg-gray-50 p-2 rounded text-red-400">7</div>
+                        </div>
+                    </div>
+                `;
+            }
+        }
+    </script>
+</body>
+</html>
